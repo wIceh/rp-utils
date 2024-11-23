@@ -16,10 +16,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class CavalliGui {
+public class HorsesGui {
 
     public void open(Player player) {
         Gui gui = Gui.gui()
@@ -41,12 +42,26 @@ public class CavalliGui {
     }
 
     private GuiItem getHorseItem(Player player, Gui gui) {
+        Map<UUID, Long> horseCooldown = RpUtils.getInstance().getHorseManager().getHorseCooldown();
+
         PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID());
         profile.setProperty(new ProfileProperty("textures", "e3RleHR1cmVzOntTS0lOOnt1cmw6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWVmZjViN2ZhZWMxOTBkMzNlZTYxZmMxNTE3Y2NlMmJlNmM0N2RhYzE5OWQ1MTNjYjEyYzI5MDQxYjcwNTYxMSJ9fX0="));
         ItemStack item = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         meta.setPlayerProfile(profile);
         meta.displayName(Component.text("§a" + Util.toSmallText("cavallo")));
+        if (horseCooldown.containsKey(player.getUniqueId())) {
+            long value = horseCooldown.get(player.getUniqueId());
+            long target = value + 300000;
+
+            long remainingMillis = target - System.currentTimeMillis();
+            long remainingSeconds = remainingMillis / 1000;
+
+            meta.lore(List.of(
+                    Component.text("§r"),
+                    Component.text("§7" + Util.toSmallText("si riprendera' tra ") + "§f" + Util.formatTime(remainingSeconds))
+            ));
+        }
         meta.setCustomModelData(1);
         item.setItemMeta(meta);
 
@@ -64,7 +79,6 @@ public class CavalliGui {
                 player.sendMessage(Component.text("§7Cavallo rimosso."));
             } else {
                 gui.close(player);
-                Map<UUID, Long> horseCooldown = RpUtils.getInstance().getHorseManager().getHorseCooldown();
                 if (horseCooldown.containsKey(player.getUniqueId())) {
                     long value = horseCooldown.get(player.getUniqueId());
                     long target = value + 300000;
