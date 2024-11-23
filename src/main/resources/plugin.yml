@@ -1,0 +1,8 @@
+name: rp-utils
+version: '1.0'
+main: me.yesice.rputils.RpUtils
+api-version: '1.20'
+authors: [ yesIce ]
+commands:
+  cavalli:
+    aliases: [cavallo, garage]
