@@ -2,9 +2,9 @@ package me.yesice.rputils;
 
 import me.yesice.rputils.commands.CavalliCommand;
 import me.yesice.rputils.listeners.HorseListener;
+import me.yesice.rputils.managers.HorseManager;
 import me.yesice.rputils.tasks.HorseCooldownTask;
 import me.yesice.rputils.tasks.HorseDistanceTask;
-import me.yesice.rputils.utils.HorseUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -17,7 +17,8 @@ import java.util.Objects;
 public final class RpUtils extends JavaPlugin {
 
     private static RpUtils instance;
-    private static World world;
+    private World world;
+    private HorseManager horseManager;
 
     @Override
     public void onEnable() {
@@ -25,6 +26,7 @@ public final class RpUtils extends JavaPlugin {
 
         instance = this;
         world = Bukkit.getWorld(Objects.requireNonNull(getConfig().getString("world")));
+        horseManager = new HorseManager();
 
         getCommand("cavalli").setExecutor(new CavalliCommand());
 
@@ -36,7 +38,7 @@ public final class RpUtils extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        List<Horse> spawnedHorses = HorseUtil.getSpawnedHorses(world);
+        List<Horse> spawnedHorses = horseManager.getSpawnedHorses(world);
         if (!spawnedHorses.isEmpty())
             spawnedHorses.forEach(Entity::remove);
     }
@@ -45,7 +47,11 @@ public final class RpUtils extends JavaPlugin {
         return instance;
     }
 
-    public static World getWorld() {
+    public World getWorld() {
         return world;
+    }
+
+    public HorseManager getHorseManager() {
+        return horseManager;
     }
 }

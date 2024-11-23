@@ -1,6 +1,6 @@
 package me.yesice.rputils.tasks;
 
-import me.yesice.rputils.listeners.HorseListener;
+import me.yesice.rputils.RpUtils;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Map;
@@ -10,9 +10,9 @@ public class HorseCooldownTask extends BukkitRunnable {
 
     @Override
     public void run() {
-        Map<UUID, Long> horseCooldown = HorseListener.getHorseCooldown();
+        Map<UUID, Long> horseCooldown = RpUtils.getInstance().getHorseManager().getHorseCooldown();
 
-        for (Map.Entry<UUID, Long> entry :horseCooldown.entrySet()) {
+        for (Map.Entry<UUID, Long> entry : horseCooldown.entrySet()) {
             UUID key = entry.getKey();
             long value = entry.getValue();
 

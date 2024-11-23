@@ -1,7 +1,8 @@
-package me.yesice.rputils.utils;
+package me.yesice.rputils.managers;
 
 import me.yesice.rputils.RpUtils;
 import me.yesice.rputils.constans.Permission;
+import me.yesice.rputils.utils.Util;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,19 +15,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
-public class HorseUtil {
+public class HorseManager {
 
-    public static boolean hasHorse(Player player) {
+    private final Map<UUID, Long> horseCooldown = new HashMap<>();
+
+    public boolean hasHorse(Player player) {
         return RpUtils.getInstance().getConfig().getStringList("have-horse").contains(player.getUniqueId().toString())
                 || player.hasPermission(Permission.SPAWN_HORSE_BYPASS.permission());
     }
 
-    public static Optional<Horse> getSpawnedHorse(Player player) {
+    public Optional<Horse> getSpawnedHorse(Player player) {
         World world = player.getLocation().getWorld();
         List<Entity> entities = world.getEntities();
 
@@ -45,7 +45,7 @@ public class HorseUtil {
         return Optional.empty();
     }
 
-    public static Optional<String> getHorseOwner(Horse horse) {
+    public Optional<String> getHorseOwner(Horse horse) {
         NamespacedKey key = new NamespacedKey(RpUtils.getInstance(), "horse");
         if (!horse.getPersistentDataContainer().has(key)) return Optional.empty();
 
@@ -55,7 +55,7 @@ public class HorseUtil {
         return Optional.of(owner);
     }
 
-    public static void spawnHorse(Player player, double speed, double jumpStrength) {
+    public void spawnHorse(Player player, double speed, double jumpStrength) {
         Location location = player.getLocation().clone();
         Horse horse = player.getLocation().getWorld().spawn(location, Horse.class);
 
@@ -80,7 +80,7 @@ public class HorseUtil {
         }
     }
 
-    public static List<Horse> getSpawnedHorses(World world) {
+    public List<Horse> getSpawnedHorses(World world) {
         List<Horse> horses = new ArrayList<>();
         List<Entity> entities = world.getEntities();
 
@@ -95,7 +95,7 @@ public class HorseUtil {
         return horses;
     }
 
-    public static Optional<Horse> getSpawnedHorse(String uniqueId, World world) {
+    public Optional<Horse> getSpawnedHorse(String uniqueId, World world) {
         List<Horse> spawnedHorses = getSpawnedHorses(world);
         for (Horse horse : spawnedHorses) {
             if (!horse.getUniqueId().toString().equals(uniqueId)) continue;
@@ -103,5 +103,9 @@ public class HorseUtil {
         }
 
         return Optional.empty();
+    }
+
+    public Map<UUID, Long> getHorseCooldown() {
+        return horseCooldown;
     }
 }

@@ -1,7 +1,6 @@
 package me.yesice.rputils.listeners;
 
 import me.yesice.rputils.RpUtils;
-import me.yesice.rputils.utils.HorseUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Horse;
@@ -20,14 +19,12 @@ import java.util.*;
 
 public class HorseListener implements Listener {
 
-    private static final Map<UUID, Long> horseCooldown = new HashMap<>();
-
     @EventHandler
     public void onHorseDeath(EntityDeathEvent event) {
         LivingEntity entity = event.getEntity();
         if (!(entity instanceof Horse horse)) return;
 
-        String owner = HorseUtil.getHorseOwner(horse).orElse(null);
+        String owner = RpUtils.getInstance().getHorseManager().getHorseOwner(horse).orElse(null);
         if (owner == null) return;
 
         event.getDrops().clear();
@@ -36,14 +33,14 @@ public class HorseListener implements Listener {
         if (player == null) return;
 
         player.sendMessage(Component.text("§4Il tuo cavallo è morto."));
-        horseCooldown.put(player.getUniqueId(), System.currentTimeMillis());
+        RpUtils.getInstance().getHorseManager().getHorseCooldown().put(player.getUniqueId(), System.currentTimeMillis());
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
-        Horse horse = HorseUtil.getSpawnedHorse(player).orElse(null);
+        Horse horse = RpUtils.getInstance().getHorseManager().getSpawnedHorse(player).orElse(null);
         if (horse == null) return;
 
         horse.remove();
@@ -55,7 +52,7 @@ public class HorseListener implements Listener {
         InventoryHolder holder = horseInventory.getHolder();
         if (!(holder instanceof Horse horse)) return;
 
-        Horse spawnedHorse = HorseUtil.getSpawnedHorse(horse.getUniqueId().toString(), horse.getWorld()).orElse(null);
+        Horse spawnedHorse = RpUtils.getInstance().getHorseManager().getSpawnedHorse(horse.getUniqueId().toString(), horse.getWorld()).orElse(null);
         if (spawnedHorse == null) return;
 
         event.setCancelled(true);
@@ -66,16 +63,12 @@ public class HorseListener implements Listener {
         Player player = event.getPlayer();
         if (!(event.getRightClicked() instanceof Horse horse)) return;
 
-        String owner = HorseUtil.getHorseOwner(horse).orElse(null);
+        String owner = RpUtils.getInstance().getHorseManager().getHorseOwner(horse).orElse(null);
         if (owner == null) return;
 
         if (!player.getUniqueId().toString().equals(owner)) {
             event.setCancelled(true);
             player.sendMessage(Component.text("§4Questo cavallo non ti appartiene."));
         }
-    }
-
-    public static Map<UUID, Long> getHorseCooldown() {
-        return horseCooldown;
     }
 }

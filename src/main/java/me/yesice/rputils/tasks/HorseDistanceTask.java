@@ -1,6 +1,6 @@
 package me.yesice.rputils.tasks;
 
-import me.yesice.rputils.utils.HorseUtil;
+import me.yesice.rputils.RpUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Horse;
@@ -12,7 +12,7 @@ public class HorseDistanceTask extends BukkitRunnable {
     @Override
     public void run() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            Horse horse = HorseUtil.getSpawnedHorse(player).orElse(null);
+            Horse horse = RpUtils.getInstance().getHorseManager().getSpawnedHorse(player).orElse(null);
             if (horse == null) continue;
 
             if (player.getLocation().distance(horse.getLocation()) >= 15) {

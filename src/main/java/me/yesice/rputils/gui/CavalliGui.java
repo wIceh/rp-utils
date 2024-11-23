@@ -5,8 +5,7 @@ import com.destroystokyo.paper.profile.ProfileProperty;
 import dev.triumphteam.gui.builder.item.ItemBuilder;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
-import me.yesice.rputils.listeners.HorseListener;
-import me.yesice.rputils.utils.HorseUtil;
+import me.yesice.rputils.RpUtils;
 import me.yesice.rputils.utils.ItemUtil;
 import me.yesice.rputils.utils.Util;
 import net.kyori.adventure.text.Component;
@@ -17,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class CavalliGui {
@@ -51,9 +51,9 @@ public class CavalliGui {
         item.setItemMeta(meta);
 
         return ItemBuilder.from(item).asGuiItem(event -> {
-            Horse horse = HorseUtil.getSpawnedHorse(player).orElse(null);
+            Horse horse = RpUtils.getInstance().getHorseManager().getSpawnedHorse(player).orElse(null);
 
-            if (!HorseUtil.hasHorse(player)) {
+            if (!RpUtils.getInstance().getHorseManager().hasHorse(player)) {
                 player.sendMessage(Component.text("§4Non hai questo cavallo."));
                 return;
             }
@@ -64,8 +64,9 @@ public class CavalliGui {
                 player.sendMessage(Component.text("§7Cavallo rimosso."));
             } else {
                 gui.close(player);
-                if (HorseListener.getHorseCooldown().containsKey(player.getUniqueId())) {
-                    long value = HorseListener.getHorseCooldown().get(player.getUniqueId());
+                Map<UUID, Long> horseCooldown = RpUtils.getInstance().getHorseManager().getHorseCooldown();
+                if (horseCooldown.containsKey(player.getUniqueId())) {
+                    long value = horseCooldown.get(player.getUniqueId());
                     long target = value + 300000;
 
                     long remainingMillis = target - System.currentTimeMillis();
@@ -74,7 +75,7 @@ public class CavalliGui {
                     player.sendMessage(Component.text("§4Il tuo cavallo si riprenderà tra " + Util.formatTime(remainingSeconds)));
                     return;
                 }
-                HorseUtil.spawnHorse(player, -1, -1);
+                RpUtils.getInstance().getHorseManager().spawnHorse(player, -1, -1);
             }
         });
     }
